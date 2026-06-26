@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ishikawa + IA · Casa Médica</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:#0f172a;color:#e2e8f0;min-height:100vh;font-family:ui-sans-serif,system-ui,sans-serif;font-size:14px}
+        input,select,button,textarea{font-family:inherit;font-size:inherit}
+        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#1e293b}::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}
+        .header{border-bottom:1px solid #1e293b;background:rgba(2,6,23,.5);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+        .header-left{display:flex;align-items:center;gap:12px}
+        .icon-box{background:#4f46e5;padding:8px;border-radius:8px}
+        h1{font-size:17px;font-weight:700;color:#fff;letter-spacing:-.3px}
+        .subtitle{font-size:11px;color:#94a3b8;margin-top:2px}
+        main{padding:24px;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+        .card{background:#020617;border:1px solid #1e293b;border-radius:12px;padding:24px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+        .section-label{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .problem-row{display:flex;align-items:flex-start;gap:16px}
+        .red-icon{background:rgba(239,68,68,.1);padding:12px;border-radius:8px;border:1px solid rgba(239,68,68,.2);flex-shrink:0}
+        .input-area{flex:1;display:flex;flex-direction:column;gap:12px}
+        .field-label{font-size:12px;font-weight:600;color:#cbd5e1;text-transform:uppercase;letter-spacing:.08em}
+        .input-row{display:flex;gap:12px}
+        .txt-input{flex:1;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px 16px;color:#e2e8f0;outline:none;transition:border-color .2s}
+        .txt-input:focus{border-color:#6366f1}
+        .txt-input::placeholder{color:#475569}
+        .btn-primary{background:#4f46e5;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:background .2s}
+        .btn-primary:hover{background:#6366f1}
+        .btn-secondary{background:#1e293b;color:#e2e8f0;border:1px solid #334155;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:background .2s}
+        .btn-secondary:hover{background:#334155}
+        .btn-ai{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:opacity .2s;font-size:13px}
+        .btn-ai:hover{opacity:.9}
+        .btn-ai:disabled{opacity:.5;cursor:not-allowed}
+        .workspace-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+        .col-main{grid-column:1/3;display:flex;flex-direction:column;gap:20px}
+        .col-side{display:flex;flex-direction:column;gap:20px}
+        .sixm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+        .cat-card{cursor:pointer;padding:14px;border-radius:10px;border:1px solid #1e293b;background:rgba(15,23,42,.5);transition:border-color .2s,background .2s}
+        .cat-card:hover{border-color:#6366f1;background:rgba(99,102,241,.05)}
+        .cat-card.active{border-color:#6366f1;background:rgba(99,102,241,.08)}
+        .cat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+        .cat-title{font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8}
+        .cat-card:hover .cat-title,.cat-card.active .cat-title{color:#818cf8}
+        .cat-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:#1e293b;color:#94a3b8}
+        .cat-badge.has-root{background:rgba(245,158,11,.15);color:#fbbf24}
+        .cat-desc{font-size:11px;color:#475569;margin-bottom:10px}
+        .progress-track{width:100%;background:#1e293b;height:5px;border-radius:999px;overflow:hidden}
+        .progress-fill{height:100%;background:#6366f1;width:0;transition:width .5s}
+        .efecto-bar{grid-column:1/4;background:rgba(30,27,75,.4);border:1px solid rgba(99,102,241,.3);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0}
+        .efecto-label{font-size:11px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+        .efecto-text{font-size:13px;font-weight:600;color:#fff;flex:1}
+        .pulse{width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0;animation:pulse 1.5s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+        .cause-input-row{display:flex;gap:8px}
+        .cause-input{flex:1;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 14px;color:#e2e8f0;outline:none;font-size:13px;transition:border-color .2s}
+        .cause-input:focus{border-color:#6366f1}
+        .cause-list{display:flex;flex-direction:column;gap:8px;max-height:160px;overflow-y:auto;padding-top:8px}
+        .cause-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:6px;font-size:12px}
+        .cause-item.normal{border:1px solid #1e293b;background:#0f172a}
+        .cause-item.root{border:1px solid rgba(245,158,11,.5);background:rgba(245,158,11,.08)}
+        .cause-text.normal{color:#cbd5e1}
+        .cause-text.root{color:#fbbf24;font-weight:600}
+        .btn-root{font-size:10px;font-weight:700;text-transform:uppercase;padding:4px 8px;border-radius:4px;border:none;cursor:pointer;white-space:nowrap}
+        .btn-root.normal{background:#1e293b;color:#94a3b8}
+        .btn-root.root{background:#d97706;color:#fff}
+        .empty-msg{font-size:12px;color:#475569;font-style:italic}
+        .sandbox-label{font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:8px;display:block}
+        select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px;color:#e2e8f0;outline:none;font-size:13px;cursor:pointer}
+        .slider-row{margin-bottom:12px}
+        .slider-meta{display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px}
+        .slider-meta span:first-child{color:#94a3b8}
+        input[type=range]{width:100%;height:5px;border-radius:999px;cursor:pointer;outline:none;border:none;background:#1e293b;appearance:none}
+        input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;cursor:pointer}
+        #slider-mitigacion{accent-color:#10b981}
+        #slider-costo{accent-color:#f59e0b}
+        .impact-box{margin-top:20px;padding:16px;border-radius:10px;background:#0f172a;border:1px solid #1e293b}
+        .impact-label{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:8px}
+        .impact-score-row{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+        .impact-number{font-size:32px;font-weight:900;color:#10b981}
+        .impact-desc{font-size:11px;color:#475569}
+        .impact-track{width:100%;background:#1e293b;height:8px;border-radius:999px;overflow:hidden}
+        .impact-fill{height:100%;background:#10b981;transition:width .3s}
+        .playbook-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+        .kanban-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:4px}
+        .kanban-col{background:rgba(15,23,42,.6);border:1px solid #1e293b;border-radius:10px;padding:16px}
+        .kanban-header{font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.08em;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+        .kanban-count{background:#1e293b;padding:2px 8px;border-radius:6px;color:#cbd5e1;font-size:11px}
+        .task-card{background:#020617;padding:12px;border-radius:8px;font-size:12px;font-weight:500;color:#cbd5e1;margin-bottom:8px;border:1px solid #1e293b;line-height:1.5}
+        .task-card.todo{border-left:3px solid #6366f1}
+        .task-card.progress{border-left:3px solid #f59e0b}
+        .task-card.done{border-left:3px solid #10b981}
+        .task-owner{font-size:10px;color:#64748b;margin-top:4px}
+        .skeleton{background:linear-gradient(90deg,#1e293b 25%,#334155 50%,#1e293b 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;height:60px;margin-bottom:8px}
+        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .ai-status{display:flex;align-items:center;gap:8px;font-size:12px;color:#818cf8;padding:10px 14px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:8px}
+        .ai-dot{width:6px;height:6px;border-radius:50%;background:#818cf8;animation:pulse 1s infinite}
+        .roots-summary{margin-top:12px;padding:12px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);border-radius:8px}
+        .roots-title{font-size:11px;font-weight:700;color:#fbbf24;text-transform:uppercase;margin-bottom:8px}
+        .root-chip{display:inline-block;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fcd34d;font-size:11px;padding:3px 10px;border-radius:20px;margin:3px}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px}
+        .modal-box{background:#0f172a;border:1px solid #334155;border-radius:14px;padding:24px;width:100%;max-width:640px;display:flex;flex-direction:column;gap:16px}
+        textarea.export-ta{background:#020617;border:1px solid #334155;border-radius:8px;padding:14px;color:#a5f3fc;font-family:ui-monospace,monospace;font-size:12px;line-height:1.6;width:100%;height:280px;resize:none;outline:none}
+        .hidden{display:none!important}
+        #exportModal:not(.hidden){display:flex!important}
+        @media(max-width:900px){.workspace-grid{grid-template-columns:1fr}.col-main{grid-column:1}.sixm-grid{grid-template-columns:1fr 1fr}.efecto-bar{grid-column:1/3}.kanban-grid{grid-template-columns:1fr}}
+        @media(max-width:600px){.sixm-grid{grid-template-columns:1fr}.efecto-bar{grid-column:1}.input-row{flex-direction:column}}
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-left">
+        <div class="icon-box">
+            <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M6 3v12M6 15l-3 3M6 15l3 3M18 6v12M18 18l-3-3M18 18l3-3M12 3v18"/></svg>
+        </div>
+        <div>
+            <h1>Ishikawa Dinámico & Sandbox de Escenarios</h1>
+            <div class="subtitle">Skill de Resolución de Problemas · Playbook generado por IA · Casa Médica</div>
+        </div>
+    </div>
+    <div style="background:rgba(30,41,59,.8);padding:4px 10px;border-radius:8px;border:1px solid #334155;font-size:11px;font-weight:600;color:#818cf8">✦ IA Activa</div>
+</header>
+<main>
+    <div class="card">
+        <div class="problem-row">
+            <div class="red-icon">
+                <svg width="22" height="22" fill="none" stroke="#f87171" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="input-area">
+                <div class="field-label">1. Define el Problema Central (El Efecto)</div>
+                <div class="input-row">
+                    <input id="problemInput" class="txt-input" type="text" placeholder="Ej: Retrasos críticos en la facturación y despacho de cirugías de urgencia...">
+                    <button class="btn-primary" onclick="setProblem()">
+                        Fijar Problema
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="workspace" class="hidden">
+        <div class="workspace-grid">
+            <div class="col-main">
+                <div class="card">
+                    <div class="section-label">
+                        <svg width="16" height="16" fill="none" stroke="#818cf8" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        Diagrama de Carga de Causas (6M)
+                    </div>
+                    <div class="sixm-grid">
+                        <div class="cat-card" id="cat-Métodos" onclick="openCategory('Métodos')">
+                            <div class="cat-header"><span class="cat-title">Métodos</span><span class="cat-badge" id="badge-Métodos">0 Causas</span></div>
+                            <div class="cat-desc">Procesos, burocracia, flujos de trabajo.</div>
+                            <div class="progress-track"><div class="progress-fill" id="bar-Métodos"></div></div>
+                        </div>
+                        <div class="cat-card" id="cat-ManoObra" onclick="openCategory('Mano de Obra')">
+                            <div class="cat-header"><span class="cat-title">Mano de Obra</span><span class="cat-badge" id="badge-ManoObra">0 Causas</span></div>
+                            <div class="cat-desc">Personal, capacitación, autorizaciones.</div>
+                            <div class="progress-track"><div class="progress-fill" id="bar-ManoObra"></div></div>
+                        </div>
+                        <div class="cat-card" id="cat-Maquinaria" onclick="openCategory('Maquinaria')">
+                            <div class="cat-header"><span class="cat-title">Maquinaria / Tech</span><span class="cat-badge" id="badge-Maquinaria">0 Causas</span></div>
+                            <div class="cat-desc">Sistemas, CRM, ERP, herramientas.</div>
+                            <div class="progress-track"><div class="progress-fill" id="bar-Maquinaria"></div></div>
+                        </div>
+                        <div class="efecto-bar">
+                            <div class="pulse"></div>
+                            <span class="efecto-label">Línea del Efecto:</span>
+                            <p class="efecto-text" id="currentProblemText"></p>
+                            <svg width="20" height="20" fill="none" stroke="#818cf8" stroke-width="2" viewBox="0 0 24 24"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                        </div>
+                        <div class="cat-card" id="cat-Materiales" onclick="openCategory('Materiales')">
+                            <div class="cat-header"><span class="cat-title">Materiales</span><span class="cat-badge" id="badge-Materiales">0 Causas</span></div>
+                            <div class="cat-desc">Insumos, stock de bodegas, documentación.</div>
+                            <div class="progress-track"><div class="progress-fill" id="bar-Materiales"></div></div>
+                        </div>
+                        <div class="cat-card" id="cat-Medición" onclick="openCategory('Medición')">
+                            <div class="cat-header"><span class="cat-title">Medición</span><span class="cat-badge" id="badge-Medición">0 Causas</span></div>
+                            <div class="cat-desc">KPIs, auditorías, reportes de control.</div>
+                            <div class="progress-track"><div class="progress-fill" id="bar-Medición"></div></div>
+                        </div>
+                        <div class="cat-card" id="cat-Entorno" onclick="openCategory('Entorno')">
+                            <div class="cat-header"><span class="cat-title">Entorno / Medio</span><span class="cat-badge" id="badge-Entorno">0 Causas</span></div>
+                            <div class="cat-desc">Cultura organizacional, contexto externo.</div>
+                            <div class="progress-track"><div class="progress-fill" id="bar-Entorno"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="categoryPanel" class="card hidden">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                        <div style="font-size:15px;font-weight:700;color:#fff">Analizando: <span id="selectedCategoryTitle" style="color:#818cf8"></span></div>
+                        <span style="font-size:11px;color:#64748b">Aplica los "5 Porqués" — marca las raíces reales</span>
+                    </div>
+                    <div class="cause-input-row">
+                        <input id="causeInput" class="cause-input" type="text" placeholder="¿Cuál es la causa o el por qué ocurre esto?">
+                        <button class="btn-secondary" onclick="addCause()">Agregar</button>
+                    </div>
+                    <div id="causesList" class="cause-list"></div>
+                </div>
+            </div>
+            <div class="col-side">
+                <div class="card" style="height:100%">
+                    <div class="section-label" style="color:#34d399">
+                        <svg width="16" height="16" fill="none" stroke="#34d399" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                        Sandbox "What-If"
+                    </div>
+                    <label class="sandbox-label">Enfoque de Ejecución</label>
+                    <select id="scenarioSelect" onchange="updateScenarioMetrics()">
+                        <option value="low">Escenario 1: Mitigación Rápida</option>
+                        <option value="mid">Escenario 2: Reingeniería Gradual</option>
+                        <option value="high">Escenario 3: Automatización Disruptiva</option>
+                    </select>
+                    <div style="margin-top:20px">
+                        <div class="slider-row">
+                            <div class="slider-meta"><span>Nivel de Mitigación de la Raíz</span><span id="val-mitigacion" style="color:#34d399;font-weight:700">50%</span></div>
+                            <input id="slider-mitigacion" type="range" min="10" max="100" value="50" oninput="calculateImpact()">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-meta"><span>Presupuesto / Recursos</span><span id="val-costo" style="color:#fbbf24;font-weight:700">$$</span></div>
+                            <input id="slider-costo" type="range" min="1" max="3" value="2" oninput="calculateImpact()">
+                        </div>
+                    </div>
+                    <div class="impact-box">
+                        <div class="impact-label">Impacto Estimado</div>
+                        <div class="impact-score-row"><span id="impactScore" class="impact-number">65%</span><span class="impact-desc">reducción del problema</span></div>
+                        <div class="impact-track"><div class="impact-fill" id="impactBar" style="width:65%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="actionPlaybook" class="card hidden">
+        <div class="playbook-header">
+            <div>
+                <div style="font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                    <svg width="18" height="18" fill="none" stroke="#818cf8" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    Playbook de Ejecución
+                </div>
+                <div style="font-size:12px;color:#64748b">Generado por IA según el problema y las causas raíz identificadas.</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button id="btnGenerate" class="btn-ai" onclick="generatePlaybook()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    Generar con IA
+                </button>
+                <button class="btn-secondary hidden" onclick="openExport()" id="btnExport">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Exportar
+                </button>
+            </div>
+        </div>
+        <div id="rootsSummary" class="roots-summary hidden">
+            <div class="roots-title">⚡ Causas Raíz identificadas — base para el Playbook</div>
+            <div id="rootChips"></div>
+        </div>
+        <div id="aiStatus" class="ai-status hidden" style="margin-top:12px">
+            <div class="ai-dot"></div>
+            <span id="aiStatusText">Analizando causas raíz y construyendo el plan de acción...</span>
+        </div>
+        <div class="kanban-grid" style="margin-top:16px">
+            <div class="kanban-col">
+                <div class="kanban-header">Por Hacer <span class="kanban-count" id="todo-count">—</span></div>
+                <div id="todo-tasks"><div style="font-size:12px;color:#334155;font-style:italic">Genera el playbook con IA para ver las tareas.</div></div>
+            </div>
+            <div class="kanban-col">
+                <div class="kanban-header">En Ejecución <span class="kanban-count" id="prog-count">—</span></div>
+                <div id="progress-tasks"><div style="font-size:12px;color:#334155;font-style:italic">—</div></div>
+            </div>
+            <div class="kanban-col">
+                <div class="kanban-header">Validación de Éxito <span class="kanban-count" id="done-count">—</span></div>
+                <div id="done-tasks"><div style="font-size:12px;color:#334155;font-style:italic">—</div></div>
+            </div>
+        </div>
+    </div>
+</main>
+<div id="exportModal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:15px;font-weight:700;color:#fff">📋 Playbook en Markdown</div>
+            <button onclick="closeExport()" class="btn-secondary">✕ Cerrar</button>
+        </div>
+        <p style="font-size:12px;color:#64748b">Selecciona todo con <strong style="color:#94a3b8">Ctrl+A</strong> y copia con <strong style="color:#94a3b8">Ctrl+C</strong>.</p>
+        <textarea id="exportText" class="export-ta" readonly></textarea>
+        <button onclick="document.getElementById('exportText').select()" class="btn-primary" style="justify-content:center">Seleccionar Todo</button>
+    </div>
+</div>
+<script>
+    let currentProblem="",selectedCategory="",generatedPlaybook=null;
+    let database={"Métodos":[],"Mano de Obra":[],"Maquinaria":[],"Materiales":[],"Medición":[],"Entorno":[]};
+    const badgeMap={"Métodos":"badge-Métodos","Mano de Obra":"badge-ManoObra","Maquinaria":"badge-Maquinaria","Materiales":"badge-Materiales","Medición":"badge-Medición","Entorno":"badge-Entorno"};
+    const barMap={"Métodos":"bar-Métodos","Mano de Obra":"bar-ManoObra","Maquinaria":"bar-Maquinaria","Materiales":"bar-Materiales","Medición":"bar-Medición","Entorno":"bar-Entorno"};
+    const catMap={"Métodos":"cat-Métodos","Mano de Obra":"cat-ManoObra","Maquinaria":"cat-Maquinaria","Materiales":"cat-Materiales","Medición":"cat-Medición","Entorno":"cat-Entorno"};
+    function setProblem(){const v=document.getElementById('problemInput').value.trim();if(!v){alert("Ingresa el problema central primero.");return;}currentProblem=v;document.getElementById('currentProblemText').innerText=v;document.getElementById('workspace').classList.remove('hidden');document.getElementById('actionPlaybook').classList.remove('hidden');openCategory('Métodos');updateScenarioMetrics();}
+    function openCategory(cat){Object.values(catMap).forEach(id=>document.getElementById(id)?.classList.remove('active'));selectedCategory=cat;document.getElementById(catMap[cat])?.classList.add('active');document.getElementById('categoryPanel').classList.remove('hidden');document.getElementById('selectedCategoryTitle').innerText=cat;renderCauses();}
+    function addCause(){const v=document.getElementById('causeInput').value.trim();if(!v)return;database[selectedCategory].push({id:Date.now(),text:v,isRoot:false});document.getElementById('causeInput').value="";renderCauses();updateCategoryBadges();calculateImpact();}
+    function toggleRoot(id){database[selectedCategory]=database[selectedCategory].map(c=>({...c,isRoot:c.id===id?!c.isRoot:c.isRoot}));renderCauses();updateRootsSummary();}
+    function renderCauses(){const el=document.getElementById('causesList');el.innerHTML="";if(!database[selectedCategory].length){el.innerHTML=`<div class="empty-msg">No hay causas en esta rama aún.</div>`;return;}database[selectedCategory].forEach(c=>{const d=document.createElement('div');d.className=`cause-item ${c.isRoot?'root':'normal'}`;d.innerHTML=`<span class="cause-text ${c.isRoot?'root':'normal'}">${c.text}</span><button class="btn-root ${c.isRoot?'root':'normal'}" onclick="toggleRoot(${c.id})">${c.isRoot?'Es Raíz ✓':'¿Es Raíz?'}</button>`;el.appendChild(d);});}
+    function updateCategoryBadges(){for(let cat in database){const all=database[cat].length,roots=database[cat].filter(c=>c.isRoot).length,badge=document.getElementById(badgeMap[cat]),bar=document.getElementById(barMap[cat]);if(badge){badge.innerText=`${all} Causa${all!==1?'s':''}${roots?` · ${roots} raíz`:''}`;badge.className=`cat-badge${roots?' has-root':''}`;}if(bar)bar.style.width=Math.min(all*25,100)+'%';}}
+    function updateRootsSummary(){updateCategoryBadges();const allRoots=[];for(let cat in database)database[cat].filter(c=>c.isRoot).forEach(c=>allRoots.push({cat,text:c.text}));const el=document.getElementById('rootsSummary'),chips=document.getElementById('rootChips');if(!allRoots.length){el.classList.add('hidden');return;}el.classList.remove('hidden');chips.innerHTML=allRoots.map(r=>`<span class="root-chip" title="${r.cat}">${r.text}</span>`).join('');}
+    function updateScenarioMetrics(){const v=document.getElementById('scenarioSelect').value,vals={low:[40,1],mid:[70,2],high:[95,3]};document.getElementById('slider-mitigacion').value=vals[v][0];document.getElementById('slider-costo').value=vals[v][1];calculateImpact();}
+    function calculateImpact(){const mit=parseInt(document.getElementById('slider-mitigacion').value),cost=parseInt(document.getElementById('slider-costo').value);document.getElementById('val-mitigacion').innerText=mit+'%';document.getElementById('val-costo').innerText="$".repeat(cost);const base=Math.min(Math.round(mit*0.8+cost*5),100);document.getElementById('impactScore').innerText=base+'%';document.getElementById('impactBar').style.width=base+'%';}
+    async function generatePlaybook(){
+        const allRoots=[],allCauses=[];
+        for(let cat in database){database[cat].filter(c=>c.isRoot).forEach(c=>allRoots.push(`[${cat}] ${c.text}`));database[cat].forEach(c=>allCauses.push(`[${cat}] ${c.text}`));}
+        const scenario=document.getElementById('scenarioSelect').value;
+        const scenarioLabel={low:"Mitigación Rápida",mid:"Reingeniería Gradual",high:"Automatización Disruptiva"}[scenario];
+        const btn=document.getElementById('btnGenerate');
+        btn.disabled=true;btn.innerHTML=`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Generando...`;
+        document.getElementById('aiStatus').classList.remove('hidden');
+        ['todo-tasks','progress-tasks','done-tasks'].forEach(id=>{document.getElementById(id).innerHTML=`<div class="skeleton"></div><div class="skeleton" style="height:44px"></div>`;});
+        updateRootsSummary();
+        const prompt=`Eres un consultor experto en mejora de procesos para empresas de distribución de equipo médico en Guatemala.\n\nPROBLEMA CENTRAL: "${currentProblem}"\n\nCAUSAS IDENTIFICADAS (Ishikawa 6M):\n${allCauses.length?allCauses.join('\n'):'Ninguna registrada.'}\n\nCAUSAS RAÍZ CONFIRMADAS:\n${allRoots.length?allRoots.join('\n'):'El equipo aún no ha marcado causas raíz.'}\n\nESCENARIO: ${scenarioLabel}\n\nGenera un Playbook con exactamente este formato JSON puro (sin texto extra, sin markdown):\n{"todo":[{"tarea":"...","responsable":"...","plazo":"..."},{"tarea":"...","responsable":"...","plazo":"..."},{"tarea":"...","responsable":"...","plazo":"..."}],"progress":[{"tarea":"...","responsable":"...","plazo":"..."},{"tarea":"...","responsable":"...","plazo":"..."}],"done":[{"tarea":"...","responsable":"...","plazo":"..."},{"tarea":"...","responsable":"...","plazo":"..."}]}\n\nReglas: tareas ESPECÍFICAS al problema y causas raíz — no genéricas. Lenguaje ejecutivo directo.`;
+        try{
+            const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
+            const data=await res.json();
+            const raw=data.content?.find(b=>b.type==='text')?.text||'';
+            const clean=raw.replace(/```json|```/g,'').trim();
+            const parsed=JSON.parse(clean);
+            generatedPlaybook=parsed;renderAIPlaybook(parsed);
+            document.getElementById('btnExport').classList.remove('hidden');
+        }catch(e){
+            ['todo-tasks','progress-tasks','done-tasks'].forEach(id=>{document.getElementById(id).innerHTML=`<div style="font-size:12px;color:#f87171">Error al generar. Verifica causas e intenta de nuevo.</div>`;});
+        }finally{
+            btn.disabled=false;btn.innerHTML=`<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Regenerar`;
+            document.getElementById('aiStatus').classList.add('hidden');
+        }
+    }
+    function renderAIPlaybook(data){const render=(id,tasks,cls,countId)=>{const el=document.getElementById(id);el.innerHTML="";(tasks||[]).forEach(t=>{const d=document.createElement('div');d.className=`task-card ${cls}`;d.innerHTML=`${t.tarea}<div class="task-owner">👤 ${t.responsable} · ⏱ ${t.plazo}</div>`;el.appendChild(d);});document.getElementById(countId).innerText=(tasks||[]).length;};render('todo-tasks',data.todo,'todo','todo-count');render('progress-tasks',data.progress,'progress','prog-count');render('done-tasks',data.done,'done','done-count');}
+    function openExport(){if(!generatedPlaybook)return;const d=generatedPlaybook;let md=`# PLAN DE ACCIÓN\n**Problema:** ${currentProblem}\n**Escenario:** ${document.getElementById('scenarioSelect').options[document.getElementById('scenarioSelect').selectedIndex].text}\n\n`;md+=`## 📋 POR HACER\n`+(d.todo||[]).map(t=>`- [ ] ${t.tarea} _(${t.responsable} · ${t.plazo})_`).join('\n')+`\n\n`;md+=`## ⏳ EN EJECUCIÓN\n`+(d.progress||[]).map(t=>`- [/] ${t.tarea} _(${t.responsable} · ${t.plazo})_`).join('\n')+`\n\n`;md+=`## ✅ VALIDACIÓN DE ÉXITO\n`+(d.done||[]).map(t=>`- [x] ${t.tarea} _(${t.responsable} · ${t.plazo})_`).join('\n');document.getElementById('exportText').value=md;document.getElementById('exportModal').classList.remove('hidden');}
+    function closeExport(){document.getElementById('exportModal').classList.add('hidden');}
+    document.getElementById('problemInput').addEventListener('keydown',e=>{if(e.key==='Enter')setProblem();});
+    document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeElement===document.getElementById('causeInput'))addCause();});
+</script>
+</body>
+</html>
